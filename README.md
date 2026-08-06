@@ -9,6 +9,14 @@ Most tools in this space are an SEO audit with a GEO section bolted on. This is
 the inverse. SEO is measured, reported, and structurally prevented from moving
 the headline number. There is a test that asserts it.
 
+![The audit UI: an AI Visibility Score of 78, three lens scores beneath it, and
+the SEO baseline reported separately](docs/screenshot.png)
+
+Those are real numbers from auditing the author's own site. Note the middle
+card: the social citation surface reports **not measured** rather than zero,
+because only 30% of it could be checked. A gap in the instrument is not a fault
+in the site, and the score says so instead of quietly counting it as failure.
+
 ---
 
 ## The number
