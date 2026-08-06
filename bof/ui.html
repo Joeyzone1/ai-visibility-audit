@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Visibility Audit</title>
+<style>
+  :root {
+    --bg:#151515; --surface:#1b1b1b; --surface-2:#202020;
+    --gold:#C99763; --gold-soft:#D8AE7C;
+    --ink:#F5F4F2; --ink-2:#c3c2b7; --muted:#8F8A84;
+    --rule:rgba(245,244,242,0.10); --grid:#2c2c2a;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+    --good:#0ca30c; --warning:#fab219; --critical:#d03b3b;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:14.5px/1.5 "Segoe UI", system-ui, sans-serif; }
+  .wrap { max-width:1000px; margin:0 auto; padding:26px 22px 60px; }
+  h1 { font-size:19px; font-weight:600; margin:0; color:var(--gold); letter-spacing:.2px; }
+  .sub { color:var(--muted); font-size:12.5px; margin-top:3px; }
+  header { display:flex; align-items:baseline; justify-content:space-between;
+           border-bottom:1px solid var(--rule); padding-bottom:14px; margin-bottom:20px; }
+  .dot { display:inline-block; width:7px; height:7px; border-radius:50%;
+         background:var(--muted); margin-right:6px; vertical-align:middle; }
+  .dot.on { background:var(--good); }
+
+  form { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  input { flex:1; min-width:220px; background:var(--surface); color:var(--ink);
+          border:1px solid var(--rule); border-radius:6px; padding:9px 11px;
+          font:inherit; }
+  input:focus { outline:none; border-color:var(--gold); }
+  input#brand { flex:0 0 190px; min-width:150px; }
+  button { background:var(--surface-2); color:var(--ink); border:1px solid var(--rule);
+           border-radius:6px; padding:9px 15px; font:inherit; cursor:pointer; }
+  button:hover:not(:disabled) { border-color:var(--gold); }
+  button.primary { background:var(--gold); color:#171717; border-color:var(--gold);
+                   font-weight:600; }
+  button:disabled { opacity:.45; cursor:default; }
+
+  .note { padding:10px 13px; border-radius:6px; border:1px solid var(--rule);
+          background:var(--surface); font-size:13px; margin-bottom:16px; }
+  .note.bad { border-color:var(--critical); color:#ffb4b4; }
+
+  .prog { background:var(--surface); border:1px solid var(--rule); border-radius:8px;
+          padding:14px 16px; margin-bottom:18px; }
+  .bar { height:5px; background:var(--grid); border-radius:3px; overflow:hidden; margin-top:9px; }
+  .bar > i { display:block; height:100%; background:var(--gold);
+             transition:width .4s ease; }
+  .prog .row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+
+  .headline { background:var(--surface); border:1px solid var(--rule); border-radius:8px;
+              padding:20px 22px; margin-bottom:14px; }
+  .score { font-size:52px; line-height:1; font-weight:600; color:var(--gold); }
+  .score small { font-size:16px; color:var(--muted); font-weight:400; }
+  .basis { color:var(--ink-2); font-size:12.5px; margin-top:10px; }
+
+  .lenses { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+            gap:12px; margin-bottom:14px; }
+  .lens { background:var(--surface); border:1px solid var(--rule); border-radius:8px;
+          padding:14px 16px; border-left:3px solid var(--grid); }
+  .lens .n { font-size:28px; font-weight:600; }
+  .lens .t { font-size:12.5px; color:var(--ink-2); margin-top:2px; }
+  .lens .w { font-size:11.5px; color:var(--muted); margin-top:5px; }
+  .lens.primary { border-left-color:var(--s1); }
+  .lens.primary2 { border-left-color:var(--s3); }
+  .lens.na .n { color:var(--muted); font-size:19px; }
+
+  .secondary { background:var(--surface); border:1px solid var(--rule);
+               border-radius:8px; padding:13px 16px; margin-bottom:14px;
+               display:flex; align-items:center; gap:14px; }
+  .secondary .n { font-size:22px; font-weight:600; color:var(--ink-2); }
+  .secondary .t { font-size:12.5px; color:var(--muted); }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:left; font-weight:500; color:var(--muted); font-size:11.5px;
+       text-transform:uppercase; letter-spacing:.5px; padding:0 10px 7px 0; }
+  td { padding:7px 10px 7px 0; border-top:1px solid var(--rule); }
+  td.id { font-family:Consolas, monospace; font-size:12px; color:var(--muted); }
+  .pill { font-size:11px; padding:2px 7px; border-radius:99px; border:1px solid var(--rule); }
+  .pill.done { color:var(--good); border-color:var(--good); }
+  .pill.failed, .pill.stalled { color:var(--critical); border-color:var(--critical); }
+  .pill.running, .pill.queued { color:var(--gold); border-color:var(--gold); }
+  a { color:var(--gold-soft); }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.6px;
+       color:var(--muted); font-weight:600; margin:24px 0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>AI Visibility Audit</h1>
+      <div class="sub">Can assistants read you, and can agents operate you</div>
+    </div>
+    <div class="sub"><span class="dot" id="dot"></span><span id="health">connecting</span></div>
+  </header>
+
+  <form id="f">
+    <input id="url" placeholder="https://example.com" autocomplete="off" required>
+    <input id="brand" placeholder="Brand name (optional)" autocomplete="off">
+    <button class="primary" id="go">Run audit</button>
+  </form>
+
+  <div id="msg"></div>
+  <div id="live"></div>
+  <div id="result"></div>
+
+  <h2>Recent runs</h2>
+  <div id="history"></div>
+</div>
+
+<script>
+const POLL = 1500;   // the job runs for minutes; the house 900ms buys nothing here
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let timer = null, watching = null;
+
+async function api(path, body){
+  const opt = body ? {method:'POST', headers:{'Content-Type':'application/json'},
+                      body:JSON.stringify(body)} : {};
+  const r = await fetch(path, opt);
+  return {code:r.status, data: await r.json().catch(()=>({}))};
+}
+
+function note(text, bad){
+  $('#msg').innerHTML = text ? `<div class="note${bad?' bad':''}">${esc(text)}</div>` : '';
+}
+
+function band(n){ return n>=85?'A':n>=70?'B':n>=55?'C':n>=40?'D':'F'; }
+
+// Coverage below this could not carry a headline number, so the surface is
+// reported as unmeasured rather than as a zero. Scoring our own missing API key
+// as the client's failure is how a report loses its credibility in one line.
+const MIN_SOCIAL_COVERAGE = 0.7;
+
+function lens(value, title, why, cls, unmeasured){
+  if (unmeasured)
+    return `<div class="lens na"><div class="n">not measured</div>
+            <div class="t">${esc(title)}</div>
+            <div class="w">${esc(unmeasured)}</div></div>`;
+  if (value === null || value === undefined)
+    return `<div class="lens na"><div class="n">not applicable</div>
+            <div class="t">${esc(title)}</div>
+            <div class="w">nothing on this page for it to measure</div></div>`;
+  return `<div class="lens ${cls}"><div class="n">${value}<small> / 100</small></div>
+          <div class="t">${esc(title)}</div>
+          <div class="w">band ${band(value)}${why?' &middot; '+esc(why):''}</div></div>`;
+}
+
+function showResult(r){
+  if (r.status !== 'done'){ $('#result').innerHTML=''; return; }
+  const cov = r.social_coverage;
+  const socialThin = cov !== null && cov !== undefined && cov < MIN_SOCIAL_COVERAGE
+    ? `only ${Math.round(cov*100)}% of it could be measured, so it did not count`
+    : null;
+  $('#result').innerHTML = `
+    <div class="headline">
+      <div class="score">${r.overall}<small> / 100</small></div>
+      <div class="sub">AI Visibility Score &middot; band ${band(r.overall)} &middot; ${esc(r.url)}</div>
+      <div class="basis">Engine readability 40%, social citation surface 35%, agent
+        operability 25%. A component that cannot be measured drops out and the rest
+        renormalise. SEO is reported below and is never part of this number.</div>
+    </div>
+    <div class="lenses">
+      ${lens(r.engine_readability, 'AI engine readability', 'can it be read and cited', 'primary')}
+      ${lens(r.social_surface, 'Social citation surface', 'where citations come from', '', socialThin)}
+      ${lens(r.agent_operability, 'AI agent operability', 'can an agent work it', 'primary2')}
+    </div>
+    <div class="secondary">
+      <div class="n">${r.seo===null?'&ndash;':r.seo}</div>
+      <div><div class="t">SEO Technical Baseline &mdash; supporting evidence, not in the score above</div>
+      <div class="t">Future readiness ${r.future_readiness ?? 0}/100, opportunity only</div></div>
+      <div style="margin-left:auto"><a href="/api/report/${esc(r.id)}" target="_blank">Open PDF &#8599;</a></div>
+    </div>`;
+}
+
+function showLive(r){
+  const busy = r && (r.status==='queued' || r.status==='running');
+  $('#go').disabled = !!busy;
+  if (!busy){ $('#live').innerHTML=''; return; }
+  $('#live').innerHTML = `
+    <div class="prog">
+      <div class="row">
+        <div><strong>${esc(r.step||'starting')}</strong>
+          <span class="sub">step ${r.step_no} of ${r.step_total} &middot; ${esc(r.url)}</span></div>
+        <button onclick="cancelRun('${esc(r.id)}')">Cancel</button>
+      </div>
+      <div class="bar"><i style="width:${r.percent}%"></i></div>
+    </div>`;
+}
+
+async function cancelRun(id){
+  const {data} = await api(`/api/run/${id}/cancel`, {});
+  note(data.cancelled ? 'Cancelling at the next step boundary, so Chromium closes cleanly.'
+                      : (data.error||'could not cancel'), !data.cancelled);
+}
+
+async function refresh(){
+  const {data} = await api('/api/runs');
+  const runs = data.runs || [];
+  const live = runs.find(r => r.status==='queued' || r.status==='running');
+  showLive(live);
+
+  if (live) watching = live.id;
+  else if (watching){
+    const done = runs.find(r => r.id===watching);
+    if (done) showResult(done);
+    watching = null;
+  } else if (!$('#result').innerHTML){
+    const last = runs.find(r => r.status==='done');
+    if (last) showResult(last);
+  }
+
+  $('#history').innerHTML = runs.length ? `<table>
+    <tr><th>Run</th><th>Status</th><th>Score</th><th>Engine</th><th>Agent</th>
+        <th>SEO</th><th>Started</th><th>URL</th></tr>
+    ${runs.map(r=>`<tr>
+      <td class="id">${esc(r.id)}</td>
+      <td><span class="pill ${esc(r.status)}">${esc(r.status)}</span></td>
+      <td>${r.overall ?? '&ndash;'}</td>
+      <td>${r.engine_readability ?? '&ndash;'}</td>
+      <td>${r.agent_operability ?? '&ndash;'}</td>
+      <td>${r.seo ?? '&ndash;'}</td>
+      <td class="sub">${esc(r.started_at)}</td>
+      <td>${esc(r.url)}</td></tr>`).join('')}
+  </table>` : '<div class="sub">Nothing yet.</div>';
+}
+
+$('#f').addEventListener('submit', async e => {
+  e.preventDefault();
+  note('');
+  const {code, data} = await api('/api/run', {url:$('#url').value, brand:$('#brand').value});
+  if (code === 202){ watching = data.run_id; refresh(); }
+  else if (code === 409) note(`A run is already in flight (${data.run_id}). One at a time: Chromium plus two services on this machine is not where to discover a race.`, true);
+  else note(data.error || 'could not start', true);
+});
+
+(async () => {
+  try { const {data} = await api('/api/health');
+        $('#dot').className = 'dot on';
+        $('#health').textContent = `${data.steps} steps`; }
+  catch { $('#health').textContent = 'offline'; }
+  refresh();
+  timer = setInterval(refresh, POLL);
+})();
+</script>
+</body>
+</html>

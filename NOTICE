@@ -1,0 +1,30 @@
+This project depends on claude-seo, which is not included here and must be
+installed separately.
+
+    claude-seo 2.2.4
+    Copyright (c) AgriciDaniel
+    MIT License
+    https://github.com/AgriciDaniel/claude-seo
+
+None of claude-seo's source is copied into this repository. bof/suite.py adds
+its scripts directory to sys.path at import time and calls the following
+functions, which is why claude-seo must be installed for anything here to run:
+
+    render_page.render_page
+    parse_html.parse_html
+    url_safety.validate_url_strict, safe_requests_get,
+                make_safe_playwright_route_handler
+    agent_ux_check.analyze_html, analyze_accessibility_tree
+    ucp_check.audit_site
+    content_quality.analyse
+    preload_check.analyse
+    google_auth.get_api_key
+    google_report.generate_report
+
+bof/suite.py pins the tested version and bof/test_suite_contract.py asserts that
+each of those functions still exists, still accepts the arguments passed to it,
+and still returns the keys read from it. Run it after any claude-seo upgrade: a
+silent signature change moves scores without failing anything else.
+
+The bundled Chromium used for rendering and for PDF output also comes from
+claude-seo's Playwright installation.

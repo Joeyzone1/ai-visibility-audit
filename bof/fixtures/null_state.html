@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title></title></head>
+<body>
+<div id="app">
+  <div class="wrap">
+    <div class="brand">Meridian Supply</div>
+    <div class="lede">Meridian Supply distributes bench consumables.</div>
+    <div class="btn" onclick="openQuote()">Get a quote</div>
+    <div class="btn" onclick="openCall()">Book a call</div>
+    <div class="tab" onclick="show(1)">Catalogue</div>
+    <div class="tab" onclick="show(2)">Delivery</div>
+    <div class="tab" onclick="show(3)">Returns</div>
+    <div class="form">
+      <div class="lbl">Company</div>
+      <input type="text" name="company">
+      <div class="lbl">Email</div>
+      <input type="email" name="email">
+      <div class="lbl">Region</div>
+      <select name="region"><option>North</option><option>South</option></select>
+      <div class="btn" onclick="send()">Send</div>
+    </div>
+  </div>
+</div>
+<script src="/static/bundle.js"></script>
+</body>
+</html>

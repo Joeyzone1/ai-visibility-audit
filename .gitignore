@@ -1,0 +1,25 @@
+# Generated reports. These contain the audited site's content and, when run for
+# a client, the client's name. Never commit them.
+audits/
+*.pdf
+
+# Your byline, kept out of the repo on purpose. See signals.json report.branding.
+bof/branding.local.json
+
+# Run history. Lives in %LOCALAPPDATA%\ai-visibility-audit by default; this
+# catches it if anyone points BOF_AUDIT_DB at the working tree.
+*.db
+*.db-wal
+*.db-shm
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

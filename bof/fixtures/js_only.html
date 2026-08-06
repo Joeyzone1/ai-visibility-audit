@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Loading</title></head>
+<body>
+<div id="root">
+  <div class="shell">
+    <div class="hero">
+      <div class="title">Vector Freight</div>
+      <div class="copy">Vector Freight moves temperature controlled cargo across
+      eleven countries. Our network runs on owned trucks and contracted rail,
+      and every consignment is tracked from origin to delivery. Customers book
+      through the portal, which returns a quote in under a minute and holds
+      capacity for four hours while paperwork is prepared. Claims are handled
+      in house. Rates are published quarterly and adjusted for fuel.</div>
+      <div class="cta" onclick="openQuote()">Get a quote</div>
+      <div class="cta secondary" onclick="openContact()">Talk to us</div>
+    </div>
+    <div class="panel" onclick="expand(1)">Coverage</div>
+    <div class="panel" onclick="expand(2)">Equipment</div>
+    <div class="form">
+      <input type="text" name="company" placeholder="Company">
+      <input type="email" name="email" placeholder="Email">
+      <div class="submit" onclick="send()">Send</div>
+    </div>
+  </div>
+</div>
+<script src="/static/app.bundle.js"></script>
+</body>
+</html>
