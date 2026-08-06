@@ -128,7 +128,7 @@ supplies the renderer, the HTML parser, the URL safety layer and a bundled
 Chromium. Install it first, then:
 
 ```bash
-git clone https://github.com/Joeyzone1/ai-visibility-audit
+git clone https://github.com/Youssef-Aylan/ai-visibility-audit
 cd ai-visibility-audit
 ```
 
