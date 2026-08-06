@@ -33,6 +33,51 @@ A component that cannot be measured with confidence drops out and the remaining
 weights renormalise, so the headline always stays out of 100 and the report says
 what carried it.
 
+## What you get
+
+```
+$ python -m bof.report https://example.com --brand "Example" --out ./audits
+
+[1/7] render and gather
+[2/7] engine and operability
+[3/7] seo baseline
+[4/7] future readiness
+[5/7] social surface
+[6/7] report envelope
+[7/7] pdf
+
+headline 69/100 (AI Visibility Score: engine readability 62%, agent
+operability 38%. The social citation surface dropped out: it could not be
+measured well enough to carry a headline number, so the remaining weights
+were renormalised)
+  engine readability 64/100 band C
+  agent operability  78/100 band B
+  social surface      0/100 (30% measured)
+  future readiness    0/100 (opportunity only)
+  seo baseline       66/100 band C (supporting evidence, not in the headline)
+```
+
+Plus a branded PDF, an `audit-data.json` with every signal and its evidence, and
+a start-here page written for whoever is paying rather than whoever is
+implementing:
+
+```
+Example.com scores 69 out of 100 for AI visibility. Broken down: assistants
+reading and quoting you, 64 out of 100; agents acting on your site, 78 out of
+100. 2 of the fixes below take under an hour each. Doing only those takes the
+score to about 80.
+
+| # | Fix                                        | Effort  | Projected |
+|---|--------------------------------------------|---------|-----------|
+| 1 | Sitemap discoverable and valid             | quick   | 75        |
+| 2 | Organization identity declared with sameAs | quick   | 80        |
+| 3 | Entity anchored to Wikidata                | project | 86        |
+```
+
+The projected scores are cumulative and recomputed, not summed. Lifts are not
+additive: each fix changes its lens's share of a renormalised headline, so
+adding them up overstates the result.
+
 ## Three rules it will not break
 
 **Absent is not the same as correct.** A page with no buttons, no accessible
@@ -75,7 +120,7 @@ supplies the renderer, the HTML parser, the URL safety layer and a bundled
 Chromium. Install it first, then:
 
 ```bash
-git clone https://github.com/YOUR-NAME/ai-visibility-audit
+git clone https://github.com/Joeyzone1/ai-visibility-audit
 cd ai-visibility-audit
 ```
 
