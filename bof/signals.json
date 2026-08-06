@@ -1,0 +1,498 @@
+{
+  "_comment": "Agent readiness scoring model. Data, not code, so weights and crawler lists can be reviewed without touching logic. last_reviewed is printed in every report footer: credibility depends on it staying fresh.",
+  "scoring_version": 2,
+  "last_reviewed": "2026-08-02",
+
+  "bands": {"A": 85, "B": 70, "C": 55, "D": 40},
+
+  "weights": {
+    "A1": 10, "A2": 8, "A3": 7,
+    "B1": 15, "B2": 5, "B3": 5,
+    "C1": 12, "C2": 6, "C3": 7,
+    "D1": 10, "D2": 10, "D3": 5
+  },
+
+  "lenses": {
+    "_min_evidence_for_headline": 0.5,
+    "_min_evidence_comment": "Share of a lens's weight that must survive for the lens to carry a number. A signal with nothing to measure (no controls, no form fields, no accessibility snapshot) drops out of the denominator and the rest renormalise pro rata, exactly as social_surface handles an unmeasurable platform. Absent is not the same as correct: scoring full marks for absence gave an empty page a B for operability. Below this floor the lens reports no score at all and says the question does not apply, because a lens computed from one surviving signal is not a lens. Mirrors social_surface's min_coverage_for_headline.",
+    "_comment": "The twelve signals split into the two questions a client actually asks: can an assistant read and cite this page, and can an agent acting for a user operate it. A2 is in both on purpose: being blocked at the edge defeats reading and doing alike, so the union is all twelve signals while the memberships sum to thirteen. Denominators are derived from the weights above (75 and 33), never written down twice.",
+    "engine_readability": {
+      "title": "AI engine readability",
+      "owner": "product",
+      "description": "Can an assistant reach this page, parse it without running JavaScript, and lift a quotable passage out of it?",
+      "signals": ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"]
+    },
+    "agent_operability": {
+      "title": "AI agent operability",
+      "owner": "engineering",
+      "description": "Can an agent acting for a user actually work this page: find the controls, name them, and fill the forms?",
+      "signals": ["A2", "D1", "D2", "D3"]
+    }
+  },
+
+  "citation_crawlers": [
+    "OAI-SearchBot",
+    "PerplexityBot",
+    "ClaudeBot",
+    "Googlebot",
+    "Bingbot"
+  ],
+
+  "training_crawlers": [
+    "GPTBot",
+    "Google-Extended",
+    "CCBot",
+    "Bytespider",
+    "anthropic-ai",
+    "cohere-ai"
+  ],
+
+  "_crawler_note": "Blocking a training crawler costs zero points and is reported as a business choice. Only blocking citation and search crawlers costs points. Competitors conflate the two. GPTBot is deliberately in the training list: OpenAI documents OAI-SearchBot as the search-surface fetcher, and the installed suite's own recommendation treats CCBot and training crawlers as optional blocks.",
+
+  "user_agents": {
+    "plain": "bof-audit/0.1 (+agent-readiness check)",
+    "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+  },
+
+  "passage": {
+    "ideal_min": 134,
+    "ideal_max": 167,
+    "partial_min": 100,
+    "partial_max": 220,
+    "_source": "SE Ranking: optimal citable passage 134-167 words. Partial credit either side, because a signal that scores nearly every real page zero discriminates nothing."
+  },
+
+  "content_start": {
+    "full_credit_at": 0.30,
+    "zero_credit_at": 0.60,
+    "_source": "SE Ranking: ~44% of AI citations come from the first 30% of a page."
+  },
+
+  "schema_types": [
+    "Organization", "LocalBusiness", "Corporation", "NGO", "Person",
+    "WebSite", "WebPage", "Article", "NewsArticle", "BlogPosting",
+    "Product", "Service", "FAQPage", "HowTo", "BreadcrumbList",
+    "Event", "Recipe", "SoftwareApplication", "Course", "JobPosting"
+  ],
+
+  "entity_types": [
+    "Organization", "LocalBusiness", "Corporation", "NGO", "Person"
+  ],
+
+  "interactive_roles": [
+    "button", "link", "textbox", "checkbox", "radio", "combobox",
+    "menuitem", "menuitemcheckbox", "menuitemradio", "tab", "slider",
+    "switch", "searchbox", "spinbutton", "option"
+  ],
+
+  "future_ready": {
+    "_comment": "Opportunity-only. Additive, never subtracts from the hard agent-readiness score. Every one of these is a draft or early-adoption standard, so absence is never a failure. Scored so a client can see how far ahead of the curve they are, and so we have something to sell that nobody else measures.",
+    "weights": {
+      "mcp_server_card": 20,
+      "mcp_manifest": 20,
+      "mcp_uri_discovery": 15,
+      "webmcp": 20,
+      "nlweb": 15,
+      "ucp": 10,
+      "llmstxt": 0
+    },
+    "titles": {
+      "mcp_server_card": "MCP server card at /.well-known/mcp/server-card.json",
+      "mcp_manifest": "MCP manifest at /.well-known/mcp",
+      "mcp_uri_discovery": "MCP discovery via well-known URI or DNS",
+      "webmcp": "WebMCP tools registered in the page",
+      "nlweb": "NLWeb ask endpoint",
+      "ucp": "Universal Commerce Protocol profile",
+      "llmstxt": "llms.txt present"
+    },
+    "standards": {
+      "mcp_server_card": "SEP-1649, draft",
+      "mcp_manifest": "SEP-1960, draft",
+      "mcp_uri_discovery": "IETF draft-serra-mcp-discovery-uri, draft",
+      "webmcp": "navigator.modelContext, in-page JS proposal; Lighthouse audits it as webmcp-registered-tools",
+      "nlweb": "NLWeb, MIT, Microsoft; every instance is an MCP server exposing ask",
+      "ucp": "Universal Commerce Protocol, early adoption",
+      "llmstxt": "no standing; weight is deliberately zero"
+    },
+    "paths": {
+      "mcp_server_card": "/.well-known/mcp/server-card.json",
+      "mcp_manifest": "/.well-known/mcp",
+      "mcp_uri_discovery": "/.well-known/mcp-server",
+      "nlweb": "/ask",
+      "llmstxt": "/llms.txt"
+    },
+    "expected_keys": {
+      "mcp_server_card": ["name", "version", "transport", "endpoint", "url",
+                          "capabilities", "tools", "protocolVersion"],
+      "mcp_manifest": ["servers", "mcpServers", "name", "endpoint", "url",
+                       "transport", "capabilities"],
+      "mcp_uri_discovery": ["name", "endpoint", "url", "transport", "servers",
+                            "capabilities", "protocolVersion"]
+    },
+    "llmstxt_note": "Reported for completeness at weight zero. Google's AI optimization guide states Search ignores llms.txt and that publishing one neither helps nor harms ranking; Mueller called the discovery use case a dead end. See seo-geo/references/llmstxt-evidence.md. The competing open-source scorer geo-optimizer-skill assigns this 18 of 100 points, which is why its totals are not comparable to ours."
+  },
+
+  "social_surface": {
+    "_comment": "Weights are correlation times actionability, not raw correlation. Reddit correlates highly but a brand cannot control it, so every recommendation is earn, never post. Domain Rating (r ~0.266) is deliberately absent: that absence is the differentiator against every backlink-centric competitor.",
+    "weights": {
+      "youtube": 30,
+      "reddit": 25,
+      "wikidata": 15,
+      "wikipedia": 15,
+      "linkedin": 10,
+      "entity_consistency": 5
+    },
+    "titles": {
+      "youtube": "YouTube presence and citability",
+      "reddit": "Organic Reddit presence",
+      "wikidata": "Wikidata entity",
+      "wikipedia": "Wikipedia article",
+      "linkedin": "LinkedIn company page linkage",
+      "entity_consistency": "Same entity across every platform"
+    },
+    "correlation_source": "Ahrefs, December 2025, 75,000 brands: YouTube mentions r~0.737, Reddit high, Wikipedia high, LinkedIn moderate, Domain Rating r~0.266.",
+    "min_coverage_for_headline": 0.7,
+    "_coverage_note": "Redistribution keeps the scale at 100 when a platform cannot be measured, but a score resting on half the model is not a headline number. Below this coverage the result is marked low confidence and the report leads with what is missing rather than with the score. A client who later discovers the strongest-weighted platform was silently skipped has every reason to distrust everything else in the report.",
+    "youtube": {
+      "freshness_days": 90,
+      "min_description_chars": 200,
+      "min_chapters": 3,
+      "top_n_for_owned": 3,
+      "search_results": 10,
+      "_freshness_source": "SE Ranking: content under 3 months is roughly 3x more likely to be cited."
+    },
+    "reddit": {
+      "min_subreddits": 3,
+      "lookback_months": 12,
+      "min_score": 5,
+      "search_limit": 50,
+      "tos_note": "Reddit's free Data API tier is non-commercial and rate limited to about 100 queries per minute on an OAuth script app. Read the Data API Terms before billing a client for this measurement; a commercial agreement may be required. When unmeasured, these 25 points are redistributed across the other platforms rather than counted as a failure."
+    },
+    "wikidata": {
+      "properties": {
+        "P856": "official website",
+        "P31": "instance of",
+        "P452": "industry",
+        "P2002": "X handle",
+        "P2013": "Facebook ID",
+        "P2397": "YouTube channel ID",
+        "P4264": "LinkedIn company ID"
+      },
+      "search_limit": 7
+    },
+    "wikipedia": {
+      "search_limit": 5,
+      "notability_note": "Wikipedia has a notability threshold no amount of optimisation can cross. When no article exists and the organisation plainly does not meet notability, this is reported as not applicable rather than as a gap, and its weight is redistributed."
+    },
+    "linkedin": {
+      "measurable_note": "LinkedIn has no public search API. The Marketing and Community APIs are partner gated and only cover pages you already own. So the only honest measurement from outside is whether the site declares its company page in sameAs and whether that page resolves. Share of voice on LinkedIn cannot be measured by any third party, including vendors who say otherwise. Follower counts, if supplied by the client, are labelled self-reported and are not scored."
+    },
+    "quota": {
+      "youtube_search_units": 100,
+      "youtube_list_units": 1,
+      "youtube_daily_units": 10000,
+      "default_run_budget": 500
+    }
+  },
+
+  "seo": {
+    "_comment": "SEO Technical Baseline. Supporting evidence, never the headline: it is deliberately absent from report.headline_weights and a check asserts it cannot move the AI Visibility Score. One page plus the sitemap evidence agent_ready already gathered, not a crawl. Every signal is presence, syntax, count, threshold or HTTP semantics, so the same input gives the same score forever.",
+    "_scope": "Scored from the single page that was rendered, plus robots.txt and the sitemap already fetched for signal A3. No crawl, no second fetch, no rendering of any other URL.",
+    "_cannot_say": [
+      "whether the page matches search intent",
+      "whether the title fits the keyword someone would search",
+      "experience, expertise, authoritativeness or trust",
+      "whether the claims in the structured data are true",
+      "whether two pages compete with each other",
+      "how this compares with a competitor",
+      "whether a heading hierarchy is meaningful rather than merely present",
+      "whether alt text is descriptive rather than merely non-empty"
+    ],
+    "_performance_note": "The base 100 contains no measured performance at all. E7 is a static hint proxy read off the HTML, not a timing. Real field data lives in seo_field, which needs a Google API key: PageSpeed Insights with no key returns 429 RESOURCE_EXHAUSTED, verified.",
+    "bands": {"A": 85, "B": 70, "C": 55, "D": 40},
+    "weights": {
+      "E1": 22, "E2": 15, "E3": 15, "E4": 12,
+      "E5": 12, "E6": 8, "E7": 6, "E8": 5, "E9": 5
+    },
+    "titles": {
+      "E1": "Indexable: status, robots directives and canonical",
+      "E2": "Title, description and social preview tags",
+      "E3": "Structured data present and typed",
+      "E4": "robots.txt and a reachable sitemap",
+      "E5": "Content depth and quality",
+      "E6": "Heading structure",
+      "E7": "Speed readiness (static hints, not a measurement)",
+      "E8": "Image alt text",
+      "E9": "Internal linking"
+    },
+    "parts": {
+      "E1": {"status_ok": 8, "no_noindex": 9, "canonical": 5},
+      "E2": {"title": 7, "description": 5, "open_graph": 3},
+      "E3": {"any_jsonld": 6, "site_entity": 5, "page_entity": 4},
+      "E4": {"robots_txt": 4, "sitemap_valid": 7, "declared": 1},
+      "E6": {"single_h1": 5, "h1_not_suspicious": 2, "two_h2": 1},
+      "E9": {"enough_links": 3, "no_internal_nofollow": 2}
+    },
+    "title_length": {"min": 15, "max": 65},
+    "description_length": {"min": 70, "max": 160},
+    "site_entity_types": ["Organization", "WebSite", "LocalBusiness"],
+    "page_entity_types": ["Article", "BlogPosting", "NewsArticle", "Product",
+                          "FAQPage", "BreadcrumbList"],
+    "min_words_for_quality": 300,
+    "min_internal_links": 5,
+    "field": {
+      "_comment": "The keyed tier. A separate score, never folded into the 100. When there is no valid key it reports null with a reason rather than redistributing: a missing performance score is a known hole, not a reweighting. One Google API key unlocks this and the 30-point YouTube signal in the social surface at the same time.",
+      "weights": {"lighthouse_performance": 30, "lighthouse_seo": 20,
+                  "lcp_p75": 20, "inp_p75": 15, "cls_p75": 15}
+    },
+    "recommendations": {
+      "E1": "Make the page indexable: return 200, remove any `noindex` from the robots meta tag and the X-Robots-Tag header, and add a self-referential absolute `<link rel=\"canonical\">`. A page that cannot be indexed cannot be cited either.",
+      "E2": "Write a title of 15 to 65 characters and a meta description of 70 to 160, and add `og:title` and `og:image` so the page previews correctly when it is shared.",
+      "E3": "Add JSON-LD structured data: one node describing the site (Organization, WebSite or LocalBusiness) and one describing this page (Article, Product, FAQPage or BreadcrumbList). This is the same markup that earns points in the AI engine readability lens.",
+      "E4": "Publish robots.txt and an XML sitemap, and reference the sitemap from robots.txt with a `Sitemap:` line so it is declared rather than found by guessing at /sitemap.xml.",
+      "E5": "Add depth. Thin pages score zero here by design: under 300 words there is not enough text to assess, and not enough to quote.",
+      "E6": "Use exactly one `<h1>` that names the page, and at least two `<h2>` sections under it. Headings are how both a reader and a retrieval system find the part of the page that answers their question.",
+      "E7": "Add resource hints: `<link rel=\"preload\">` for the largest above-the-fold image, `fetchpriority=\"high\"` on it, and speculation rules for likely next navigations. This measures the presence of hints, not actual speed.",
+      "E8": "Give every meaningful `<img>` a non-empty `alt`. Decorative images should carry `alt=\"\"` deliberately rather than no attribute at all.",
+      "E9": "Link to at least five other pages on the site from this one, and do not put `rel=\"nofollow\"` on internal links: it stops crawlers following your own site."
+    }
+  },
+
+  "report": {
+    "_comment": "The AI Visibility Score. Three components, weighted. Future readiness is never folded in: it is opportunity-only and a site with a perfect hard score should not be marked down for not having shipped a draft standard. SEO is never folded in either, or the product is just another SEO tool. Any component that cannot be measured with confidence drops out and the remaining weights are renormalised pro rata, the same way social_surface redistributes an unmeasurable platform, so the headline always stays out of 100 and the report says what carried it.",
+    "branding": {
+      "_comment": "google_report.py hardcodes its own identity into the title page and footer. These are the strings we replace before printing. If a suite upgrade changes any string marked required, report generation stops rather than shipping a client PDF that says 'Prepared by Claude SEO'.",
+      "_author_note": "Put your own name or company here, or create bof/branding.local.json (gitignored) with just the keys you want to override. Whatever is set here is printed on every PDF as the byline, so a report generated from an unedited clone should not carry someone else's name.",
+      "author": "AI Visibility Audit",
+      "badge": "AI Agent Visibility Audit",
+      "score_label": "AI Visibility Score",
+      "intro": "This report presents an AI agent visibility audit of",
+      "evidence_sentence": "Findings combine crawler access, server-side rendering, structured data, accessibility-tree evidence, social citation surface, and published agent surfaces."
+    },
+    "_headline_weights_comment": "Governance: a component enters the headline only if it predicts a distinct business outcome and answers to a distinct budget owner. Nothing is added for completeness, and SEO is never added at all. Changing a weight changes every stored score's meaning, so it bumps SCORING_VERSION.",
+    "headline_weights": {
+      "engine_readability": 0.40,
+      "social_surface": 0.35,
+      "agent_operability": 0.25
+    },
+    "severity_thresholds": {"critical": 0.34, "warning": 0.67, "info": 1.0},
+    "phases": [
+      {"name": "Phase 1, fix now", "timeframe": "0-2 weeks", "severity": "critical"},
+      {"name": "Phase 2, close the gaps", "timeframe": "1-2 months", "severity": "warning"},
+      {"name": "Phase 3, stay ahead", "timeframe": "this quarter", "severity": "info"}
+    ]
+  },
+
+  "meaning": {
+    "_comment": "Two plain sentences per signal: what it means for someone who does not write markup, and what it costs to leave alone. The measurement line already says what we looked at; this says why anyone should care. Written for the person paying for the audit, not the person implementing it. No invented statistics: where a number appears it comes from the _source note on the signal itself.",
+    "A1": {
+      "means": "robots.txt is the note on your front door telling automated visitors which rooms they may enter. The assistants that cite sources, ChatGPT's search bot, Perplexity, Claude and Google, all read it before fetching anything. Blocking them is not the same as blocking the bots that harvest training data, and the two are routinely confused.",
+      "risk": "Assistants will not fetch your pages at all, so you cannot be quoted no matter how good the writing is."
+    },
+    "A2": {
+      "means": "Assistants fetch pages with plain HTTP clients, not real browsers. Bot-protection and firewall rules often treat anything without a browser signature as suspicious and serve it a challenge page instead of your content.",
+      "risk": "Your site looks fine to you and returns a blank challenge to every assistant that tries to read it."
+    },
+    "A3": {
+      "means": "A sitemap is a table of contents listing every page you want found. It is how a crawler discovers pages nothing links to yet, which usually means your newest work.",
+      "risk": "Recent posts stay undiscovered for weeks, so you are cited on old material and invisible on current material."
+    },
+    "B1": {
+      "means": "Some sites send an empty shell and let JavaScript build the page in the browser. A person sees the finished article; a search fetcher, which does not run JavaScript, sees the empty shell.",
+      "risk": "The assistant reads a blank page and quotes a competitor whose text was in the HTML."
+    },
+    "B2": {
+      "means": "Where your main content sits in the page source matters, because retrieval systems weight the opening of a document heavily. Navigation, banners and cookie panels stacked above the article push it down.",
+      "risk": "The part of the page that answers the question is buried under furniture, and gets skipped."
+    },
+    "B3": {
+      "means": "An assistant answering a question does not quote a whole article. It lifts one self-contained block that answers the question on its own. Sections that ramble past that length get paraphrased or skipped; sections too short lack the context to stand alone.",
+      "risk": "You rank, they get quoted. The citation credit and the brand mention go to whoever wrote in quotable blocks."
+    },
+    "C1": {
+      "means": "Structured data is a machine-readable summary embedded in the page saying what this is: an article, a product, a company. Without it a system must infer everything from prose, and inference is where mistakes about your business come from.",
+      "risk": "Assistants describe what you do imprecisely, or omit you from comparisons because they could not classify you."
+    },
+    "C2": {
+      "means": "A sameAs list is the line connecting this website to your other profiles: LinkedIn, YouTube, Wikipedia, Wikidata. It is how a system works out that the company here and the company there are one entity.",
+      "risk": "Your presence stays scattered across platforms that never get joined up, so none of it accumulates into authority."
+    },
+    "C3": {
+      "means": "Wikidata is the open database that most AI systems consult to resolve who or what something is. Unlike Wikipedia it has no notability bar, it is free, and an entry takes an afternoon.",
+      "risk": "Assistants have no canonical record of your organisation and fall back on guessing from whatever text they find."
+    },
+    "D1": {
+      "means": "An agent acting for a user finds what it can press by reading the accessibility tree. Real buttons and links appear there; a styled div with a click handler does not, however obviously it looks like a button to a person.",
+      "risk": "An agent trying to book, buy or subscribe on a customer's behalf cannot see the control and gives up."
+    },
+    "D2": {
+      "means": "Every control needs a name an agent can read. Without one it can see that something is pressable but not what pressing it does, so it cannot describe the action or confirm it with the user first.",
+      "risk": "An agent will not press a button it cannot name, because it cannot tell the user what it is about to do."
+    },
+    "D3": {
+      "means": "A form field needs a real label tied to it. A styled div sitting next to an input looks like a label to a person and is invisible to software.",
+      "risk": "An agent filling a form on a user's behalf puts the email in the company box, or refuses to try."
+    },
+    "E1": {
+      "means": "This covers whether the page returns a normal 200, whether anything tells search engines to ignore it, and whether it names itself as the canonical version.",
+      "risk": "The page is excluded from the index entirely, which puts every other finding here out of reach."
+    },
+    "E2": {
+      "means": "The title and description are what a person reads before deciding to click, and what many systems quote when they mention you. Social preview tags decide what appears when the link is shared.",
+      "risk": "Your link looks unfinished wherever it is shared, and systems write their own summary of your page instead."
+    },
+    "E3": {
+      "means": "The same structured data that earns points for AI readability also drives rich results in traditional search. One piece of markup, two payoffs.",
+      "risk": "You miss rich results in search and precise classification in AI answers at the same time."
+    },
+    "E4": {
+      "means": "robots.txt and a sitemap are the two files that tell crawlers where to go and what exists. Declaring the sitemap inside robots.txt is what turns finding it from guesswork into a lookup.",
+      "risk": "Discovery depends on a crawler guessing the conventional path, and pages nothing links to may never be found."
+    },
+    "E5": {
+      "means": "Depth is measured here as word count and text quality: filler, repetition, and how much of the page is actual information. Below roughly three hundred words there is not enough to assess or to quote.",
+      "risk": "Thin pages are passed over for retrieval, and a site of them reads as low quality overall."
+    },
+    "E6": {
+      "means": "Headings are the skeleton. One h1 naming the page, h2s marking each section. Retrieval systems use them to find which part of a long page answers a specific question.",
+      "risk": "A system cannot locate the relevant section, so it quotes a page with clearer structure instead."
+    },
+    "E7": {
+      "means": "This checks for hints in the HTML that help a browser load the important things first. It is a readiness check on the markup, not a measurement of how fast the page actually loaded.",
+      "risk": "Slower rendering for real visitors. This one is about people more than machines."
+    },
+    "E8": {
+      "means": "Alt text is the written description of an image. It is the only thing text-based systems can read about a picture, and it is what a screen reader announces.",
+      "risk": "Your images contribute nothing to what the page is understood to be about, and are unusable to anyone not looking at them."
+    },
+    "E9": {
+      "means": "Links from this page to your other pages are how crawlers find the rest of the site and how they judge which pages you consider important.",
+      "risk": "Other pages go undiscovered, and nothing signals which of your work matters most."
+    },
+    "youtube": {
+      "means": "Of everything measured across a large sample of brands, YouTube presence tracked AI citation more closely than any other signal, and far more closely than backlink authority. Video transcripts are heavily represented in what these systems were trained on.",
+      "risk": "You are absent from the surface that correlates most strongly with being cited at all."
+    },
+    "reddit": {
+      "means": "Reddit threads are quoted disproportionately often by AI assistants, because they read as real people comparing real options rather than marketing copy.",
+      "risk": "When someone asks an assistant to compare options in your category, the discussion it draws on does not mention you."
+    },
+    "wikidata": {
+      "means": "The open entity database most AI systems use to resolve identity. Free, no notability bar, and the single highest-return item in this whole report for most sites.",
+      "risk": "No canonical machine-readable record of your organisation exists anywhere."
+    },
+    "wikipedia": {
+      "means": "A Wikipedia article is a strong trust signal, but notability is judged by outside editors and no amount of effort guarantees one. Treat it as a long game, not a task.",
+      "risk": "A gap against competitors who have one, which is worth knowing about even though you cannot simply decide to close it."
+    },
+    "linkedin": {
+      "means": "A company page that your site links to and that resolves is a cheap, verifiable identity anchor tying the organisation to the website.",
+      "risk": "One of the easiest identity connections available is left unmade."
+    },
+    "entity_consistency": {
+      "means": "The same organisation name, spelled the same way, across your site and every profile. Systems join records by matching them, and a variation reads as a different entity.",
+      "risk": "Your presence splits into several partial entities, none of which carries the full weight."
+    }
+  },
+
+  "blockers": {
+    "_comment": "Signals that stop AI visibility outright rather than reducing it. Only these can raise a critical finding; everything else below the critical threshold reports as a warning. Without this gate 10 of 24 findings on a normal page were critical, and a word that describes almost everything describes nothing. Changing this list reclassifies stored signal fingerprints, so it bumps SCORING_VERSION.",
+    "ids": ["A1", "A2", "B1", "E1"],
+    "why": {
+      "A1": "robots.txt blocking the citation crawlers means no assistant may fetch the page at all",
+      "A2": "an edge rule serving non-browser clients a challenge blocks every fetcher that is not a browser",
+      "B1": "content that only exists after JavaScript runs is invisible to search fetchers, which do not execute it",
+      "E1": "a page that cannot be indexed cannot be retrieved, so nothing downstream matters"
+    }
+  },
+
+  "platforms": {
+    "_comment": "What the site is built on, and which signals its owner cannot change from inside it. Telling someone to fix markup their platform generates is how a report gets closed and never reopened. A platform-limited signal still scores, because an agent hitting the page is blocked either way and pretending otherwise would flatter the score, but it stops promising a headline lift the owner cannot collect and it carries the workaround instead of the instruction.",
+    "detect": [
+      {"id": "substack", "name": "Substack",
+       "headers": {"x-served-by": "substack"}, "html": ["substackcdn.com", "substack.com/api"],
+       "limited": ["B2", "B3", "C1", "D1", "D2", "D3", "E2", "E6", "E7", "E8", "E9"],
+       "workaround": "Substack generates the page markup and does not expose it. What you can still control: the post body text, its heading structure inside the editor, your publication name and links, and the custom domain. Everything else needs either a Substack feature request or a move to a platform where you own the template."},
+      {"id": "medium", "name": "Medium",
+       "headers": {}, "html": ["cdn-client.medium.com", "medium.com/_/"],
+       "limited": ["B2", "C1", "D1", "D2", "D3", "E2", "E7", "E8", "E9"],
+       "workaround": "Medium owns the template and the structured data. Only the article body and its headings are yours."},
+      {"id": "ghost", "name": "Ghost",
+       "headers": {}, "html": ["content=\"Ghost "],
+       "limited": [],
+       "workaround": "Ghost themes are editable, so everything here is in reach through the theme files or code injection."},
+      {"id": "wix", "name": "Wix",
+       "headers": {"x-wix-request-id": ""}, "html": ["static.parastorage.com"],
+       "limited": ["B1", "D1", "D2"],
+       "workaround": "Wix renders client side and generates its own controls. Structured data and meta tags are editable through the SEO panel; markup is not."},
+      {"id": "squarespace", "name": "Squarespace",
+       "headers": {}, "html": ["squarespace.com/universal", "static1.squarespace.com"],
+       "limited": ["D1", "D2", "E7"],
+       "workaround": "Squarespace generates form and navigation markup. Code injection covers head tags and structured data."},
+      {"id": "wordpress", "name": "WordPress",
+       "headers": {}, "html": ["/wp-content/", "/wp-includes/"],
+       "limited": [],
+       "workaround": "WordPress exposes everything through the theme, a plugin, or a filter. Nothing here is out of reach."}
+    ]
+  },
+
+  "effort": {
+    "_comment": "How much it costs to act, which severity and lift both fail to capture. Sorting the action plan by lift alone puts 'create a Wikidata item' above 'publish a sitemap and link it from robots.txt': the first needs outside parties and months, the second is ten minutes, and the number meant to make the plan actionable makes it discouraging instead. Each phase sorts by effort band first, then by lift inside the band. A parallel map rather than a field inside each recommendation, so nothing that reads recommendations[id] as a string had to change.",
+    "_ranks": {"quick": 0, "project": 1, "campaign": 2},
+    "_definitions": {
+      "quick": "under an hour, one person, no approvals",
+      "project": "under a sprint, one team, no outside parties",
+      "campaign": "needs outside parties, editorial approval or sustained effort"
+    },
+    "A1": "quick", "A2": "project", "A3": "quick",
+    "B1": "project", "B2": "project", "B3": "project",
+    "C1": "quick", "C2": "quick", "C3": "project",
+    "D1": "project", "D2": "project", "D3": "quick",
+    "E1": "quick", "E2": "quick", "E3": "quick", "E4": "quick", "E5": "project",
+    "E6": "quick", "E7": "project", "E8": "quick", "E9": "quick",
+    "_social_comment": "Wikipedia is the campaign case: notability is judged by outside editors and no amount of our effort guarantees an article. C3 is Wikidata, not Wikipedia, and its own recommendation text says Wikidata has no notability bar and is free, so it is a project and belongs above the campaigns rather than buried with them.",
+    "youtube": "campaign", "reddit": "campaign", "wikipedia": "campaign",
+    "wikidata": "project", "linkedin": "quick",
+    "entity_consistency": "quick", "coverage": "quick",
+    "mcp_server_card": "project", "mcp_manifest": "project",
+    "mcp_uri_discovery": "project", "webmcp": "project", "nlweb": "project",
+    "ucp": "project", "llmstxt": "quick"
+  },
+
+  "recommendations": {
+    "A1": "Allow the citation crawlers explicitly in robots.txt. Add a block per crawler: `User-agent: OAI-SearchBot` then `Allow: /`, and the same for PerplexityBot, ClaudeBot, Googlebot and Bingbot. Blocking training crawlers such as GPTBot or Google-Extended is a separate business decision and costs you nothing here.",
+    "A2": "A plain HTTP client is being treated differently from a browser, usually by a WAF or bot rule. Allowlist the citation crawler user agents at the edge, and verify with `curl -A 'OAI-SearchBot' https://yourdomain/`. If that returns 403 or a challenge page, no assistant can read the site.",
+    "A3": "Publish an XML sitemap at /sitemap.xml and reference it from robots.txt with a `Sitemap: https://yourdomain/sitemap.xml` line. Every URL you want cited must appear in it.",
+    "B1": "Server-render the primary content. Search fetchers for the major assistants do not execute JavaScript, so anything injected client side is invisible to them. Move the main copy into the initial HTML response, or add server-side rendering or static generation for the routes that matter.",
+    "B2": "Move the primary content earlier in the DOM. Roughly 44 percent of AI citations come from the first 30 percent of a page, so navigation, banners and cookie panels ahead of the main content cost you citations. Use a `<main>` element and place it high.",
+    "B3": "Restructure long sections into self-contained blocks of roughly 134 to 167 words, each answering one question completely, each under its own question-shaped H2 or H3. A block that needs surrounding context to make sense cannot be quoted.",
+    "C1": "Add JSON-LD structured data in a `<script type=\"application/ld+json\">` block. At minimum an Organization node for the site and an Article, Product or Service node matching the page type.",
+    "C2": "Add a `sameAs` array to your Organization node listing every profile you control: LinkedIn, YouTube, Wikipedia, Wikidata, X. This is what connects your site to your entity across the graph, and it takes ten minutes.",
+    "C3": "Create a Wikidata item and reference it from your Organization `sameAs`. Wikidata has no notability bar like Wikipedia's, it is free, and it is the single highest-return action available to most sites.",
+    "D1": "Replace `<div onclick=...>` widgets with real `<button>` and `<a href>` elements. An agent's map of what can be pressed comes from the accessibility tree, and a clickable div does not appear on it as a control.",
+    "D2": "Give every interactive element an accessible name, through visible text, `aria-label`, or `aria-labelledby`. An unnamed control cannot be described, requested, or confirmed by an agent acting for a user.",
+    "D3": "Associate every form field with a label, either a real `<label for=\"field-id\">` or an `aria-label` on the field. Styled divs beside an input look like labels to a person and are invisible to an agent.",
+    "mcp_server_card": "Publish an MCP server card at /.well-known/mcp/server-card.json (SEP-1649) describing the tools your site exposes. Draft standard, so this is a first-mover position rather than a requirement.",
+    "mcp_manifest": "Publish an MCP manifest at /.well-known/mcp (SEP-1960). Draft standard.",
+    "mcp_uri_discovery": "Publish MCP discovery metadata at /.well-known/mcp-server, or advertise it with a TXT record at _mcp.yourdomain. IETF draft.",
+    "webmcp": "Register your key on-page actions as WebMCP tools through `navigator.modelContext`, so an agent can search, book or check stock without scraping your interface. Lighthouse already audits this as webmcp-registered-tools.",
+    "nlweb": "Stand up an NLWeb endpoint. It turns your existing schema.org and RSS content into an ask endpoint that any agent can query, and every instance is also an MCP server. MIT licensed, from Microsoft.",
+    "ucp": "Publish a Universal Commerce Protocol profile at /.well-known/ucp if you sell anything, so agents can transact rather than only read. Early adoption.",
+    "llmstxt": "No action recommended. Google states Search ignores llms.txt and that publishing one neither helps nor harms rankings. Keep it only if you want it for non-Google crawlers."
+  },
+
+  "signal_titles": {
+    "A1": "Citation crawlers allowed in robots.txt",
+    "A2": "Non-browser clients get the same access",
+    "A3": "Sitemap discoverable and valid",
+    "B1": "Content present without JavaScript",
+    "B2": "Primary content near the top of the DOM",
+    "B3": "Passages sized for citation",
+    "C1": "Structured data present and typed",
+    "C2": "Organization identity declared with sameAs",
+    "C3": "Entity anchored to Wikidata",
+    "D1": "Real controls rather than clickable divs",
+    "D2": "Interactive elements have accessible names",
+    "D3": "Form inputs are labelled"
+  }
+}

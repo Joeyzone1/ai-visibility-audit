@@ -1,0 +1,89 @@
+{
+  "_comment": "Canned evidence for the offline self-check. The HTML is real and gets parsed for real; the network parts and the ARIA snapshot are fixed so the score is deterministic. aria_snapshot strings mirror what Chromium actually produces, including the fact that a placeholder supplies an accessible name of last resort and a bare input beside a styled div does not.",
+
+  "_lens_comment": "expected_lens_bands are recorded from a run, not predicted, so they are a regression tripwire. div_soup is the case that justifies the split: it reads as a C for an assistant and a D for an agent trying to operate it, and the old single number averaged that difference away.",
+
+  "ssr_good": {
+    "expected_band": "A",
+    "expected_lens_bands": {"engine_readability": "A", "agent_operability": "A"},
+    "raw_is_rendered": true,
+    "raw_html": "",
+    "evidence": {
+      "robots_txt": "User-agent: *\nAllow: /\nSitemap: https://ssr_good.test/sitemap.xml\n",
+      "plain": {"status": 200, "words": 340},
+      "browser": {"status": 200},
+      "sitemap": {"discovered": true, "valid": true, "loc_count": 14,
+                  "source": "robots.txt", "url": "https://ssr_good.test/sitemap.xml"},
+      "wikidata": {"declared_qid": "Q7059932", "found_qid": null, "looked_up": true},
+      "aria_snapshot": "- main:\n  - heading \"Agent readiness for instrument makers\" [level=1]\n  - paragraph: Northwind Instruments builds calibration hardware for laboratory benches.\n  - heading \"What agent readiness measures\" [level=2]\n  - heading \"How the score is calculated\" [level=2]\n  - link \"Documentation\"\n  - link \"Pricing\"\n  - textbox \"Work email\"\n  - button \"Request an audit\"\n"
+    }
+  },
+
+  "js_only": {
+    "expected_band": "F",
+    "expected_lens_bands": {"engine_readability": "F", "agent_operability": "F"},
+    "raw_is_rendered": false,
+    "raw_html": "<!doctype html><html><head><title>Loading</title></head><body><div id=\"root\"></div><script src=\"/static/app.bundle.js\"></script></body></html>",
+    "evidence": {
+      "robots_txt": "User-agent: OAI-SearchBot\nDisallow: /\n\nUser-agent: PerplexityBot\nDisallow: /\n\nUser-agent: ClaudeBot\nDisallow: /\n\nUser-agent: Bingbot\nDisallow: /\n\nUser-agent: *\nAllow: /\n",
+      "plain": {"status": 403, "words": 0},
+      "browser": {"status": 200},
+      "sitemap": {"discovered": false, "valid": false, "loc_count": 0,
+                  "source": null, "url": null},
+      "wikidata": {"declared_qid": null, "found_qid": null, "looked_up": true},
+      "aria_snapshot": "- generic:\n  - generic: Vector Freight\n  - generic: Vector Freight moves temperature controlled cargo across eleven countries.\n  - generic: Get a quote\n  - generic: Talk to us\n  - generic: Coverage\n  - generic: Equipment\n  - textbox \"Company\"\n  - textbox \"Email\"\n  - generic: Send\n"
+    }
+  },
+
+  "null_state": {
+    "_comment": "A page neither an assistant nor an agent can use. Controls are present and broken rather than absent, so every operability signal scores rather than dropping out: div-onclick widgets instead of buttons, inputs whose labels are styled divs, unnamed interactive nodes. A WAF serves the plain UA a 403 while the browser UA gets 200, which is exactly what A2 exists to catch and is what takes the last partial credit off the board. Both lenses band F and the headline is 0. This is the product's core promise as a fixture: if AI cannot see you, we score you 0, not 8.",
+    "expected_band": "F",
+    "expected_lens_bands": {"engine_readability": "F", "agent_operability": "F"},
+    "expected_headline": 0,
+    "raw_is_rendered": false,
+    "raw_html": "<!doctype html><html><head><title></title></head><body><div id=\"app\"></div><script src=\"/static/bundle.js\"></script></body></html>",
+    "evidence": {
+      "robots_txt": "User-agent: *\nDisallow: /\n",
+      "plain": {"status": 403, "words": 0},
+      "browser": {"status": 200},
+      "sitemap": {"discovered": false, "valid": false, "loc_count": 0,
+                  "source": null, "url": null},
+      "wikidata": {"declared_qid": null, "found_qid": null, "looked_up": true},
+      "aria_snapshot": "- generic:\n  - generic: Meridian Supply\n  - generic: Meridian Supply distributes bench consumables.\n  - generic: Get a quote\n  - generic: Book a call\n  - textbox\n  - textbox\n  - combobox\n"
+    }
+  },
+
+  "no_controls": {
+    "_comment": "A legitimate static article: nothing wrong with it, simply nothing for an agent to operate. D1, D2 and D3 have nothing to measure, so they drop out of the operability denominator, leaving A2 alone: 8 of 33 points, under the evidence floor. The lens must report no score at all rather than 100 for having no faults. This is the case the old full-marks-for-absence behaviour got wrong on every content page in the world.",
+    "expected_band": "C",
+    "expected_lens_bands": {"engine_readability": "B", "agent_operability": null},
+    "expected_not_applicable": ["agent_operability"],
+    "raw_is_rendered": true,
+    "raw_html": "",
+    "evidence": {
+      "robots_txt": "User-agent: *\nAllow: /\nSitemap: https://no_controls.test/sitemap.xml\n",
+      "plain": {"status": 200, "words": 420},
+      "browser": {"status": 200},
+      "sitemap": {"discovered": true, "valid": true, "loc_count": 9,
+                  "source": "robots.txt", "url": "https://no_controls.test/sitemap.xml"},
+      "wikidata": {"declared_qid": null, "found_qid": null, "looked_up": true},
+      "aria_snapshot": "- main:\n  - heading \"Calibrating a bench balance\" [level=1]\n  - paragraph: A bench balance drifts with temperature and with the age of its load cell.\n  - heading \"Why drift happens\" [level=2]\n  - heading \"How often to recalibrate\" [level=2]\n"
+    }
+  },
+
+  "div_soup": {
+    "expected_band": "D",
+    "expected_lens_bands": {"engine_readability": "C", "agent_operability": "D"},
+    "raw_is_rendered": true,
+    "raw_html": "",
+    "evidence": {
+      "robots_txt": "User-agent: *\nAllow: /\nSitemap: https://div_soup.test/sitemap.xml\n",
+      "plain": {"status": 200, "words": 120},
+      "browser": {"status": 200},
+      "sitemap": {"discovered": true, "valid": true, "loc_count": 6,
+                  "source": "robots.txt", "url": "https://div_soup.test/sitemap.xml"},
+      "wikidata": {"declared_qid": null, "found_qid": null, "looked_up": true},
+      "aria_snapshot": "- heading \"Harbour Dental Care\" [level=1]\n  - heading \"Services\" [level=2]\n  - heading \"Getting here\" [level=2]\n  - link \"About\"\n  - link \"Opening hours\"\n  - generic: General\n  - generic: Hygiene\n  - generic: Emergency\n  - generic: Morning slots\n  - generic: Afternoon slots\n  - generic: Call the practice\n  - textbox\n  - textbox\n  - combobox\n"
+    }
+  }
+}

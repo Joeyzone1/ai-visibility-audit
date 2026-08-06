@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Harbour Dental Care</title></head>
+<body>
+<h1>Harbour Dental Care</h1>
+<div class="intro">Harbour Dental Care has treated families on the south quay
+since 1998. We offer general dentistry, hygiene appointments, and emergency
+cover on weekends.</div>
+
+<h2>Services</h2>
+<div class="body">Check ups, cleaning, whitening, crowns, and same day repairs.
+Appointments run from eight in the morning until six in the evening on
+weekdays.</div>
+
+<h2>Getting here</h2>
+<div class="body">Two minutes from the quay bus stop, with parking behind the
+building.</div>
+
+<div class="nav">
+  <a href="/team">About</a>
+  <a href="/hours">Opening hours</a>
+</div>
+
+<div class="tab" onclick="show('general')">General</div>
+<div class="tab" onclick="show('hygiene')">Hygiene</div>
+<div class="tab" onclick="show('emergency')">Emergency</div>
+<div class="card" onclick="book('am')">Morning slots</div>
+<div class="card" onclick="book('pm')">Afternoon slots</div>
+<div class="card" onclick="call()">Call the practice</div>
+
+<div class="form">
+  <div class="lbl">Your name</div>
+  <input type="text" name="name">
+  <div class="lbl">Phone</div>
+  <input type="tel" name="phone">
+  <div class="lbl">Service</div>
+  <select name="service"><option>Check up</option><option>Hygiene</option></select>
+</div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Northwind Instruments</title></head>
+<body>
+<main>
+<h1>Agent readiness for instrument makers</h1>
+<p>Northwind Instruments builds calibration hardware for laboratory benches.</p>
+
+<h2>What agent readiness measures</h2>
+<p>Agent readiness measures whether an automated client can reach a page, read
+its content without running JavaScript, and operate its controls without
+guessing. Three things decide the outcome. The server must return the same
+markup to a plain client that it returns to a browser, because search fetchers
+from the major assistants do not execute scripts and will index an empty shell
+if that is all the origin sends. The controls on the page must be real buttons
+and real links rather than generic containers wired to click handlers, because
+an accessibility tree is the only reliable map an agent has of what can be
+pressed. And every interactive element needs an accessible name, since a
+control with no name cannot be described, requested, or confirmed. Sites that
+get all three right are readable by every assistant without any special file or
+protocol.</p>
+
+<h2>How the score is calculated</h2>
+<p>Each signal produces a bounded ratio between zero and one, then multiplies
+by its weight. Nothing counts raw occurrences, so a long page and a short page
+with identical markup quality receive identical scores. That property matters
+more than it sounds. Deduction models that subtract a fixed penalty for every
+unlabelled input punish large pages for being large, which produces scores that
+drift whenever content is added and destroys a client's trust in the number.
+Bounded ratios also make the material change gate meaningful: if a rerun moves
+the total by less than three points and no signal has flipped state, the report
+says nothing changed rather than inventing movement. Every row carries the
+method used and the raw evidence behind it, so any difference between two runs
+can be traced to a specific measurement.</p>
+
+<p><a href="/docs">Documentation</a> and <a href="/pricing">Pricing</a></p>
+
+<form action="/audit" method="post">
+  <label for="email">Work email</label>
+  <input type="email" id="email" name="email">
+  <button type="submit">Request an audit</button>
+</form>
+</main>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Northwind Instruments",
+  "url": "https://ssr_good.test/",
+  "sameAs": [
+    "https://www.wikidata.org/entity/Q7059932",
+    "https://en.wikipedia.org/wiki/Northwind",
+    "https://www.linkedin.com/company/northwind-instruments"
+  ]
+}
+</script>
+</body>
+</html>
